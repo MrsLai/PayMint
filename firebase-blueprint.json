@@ -1,0 +1,305 @@
+{
+  "entities": {
+    "WorkspaceState": {
+      "title": "WorkspaceState",
+      "description": "Authenticated user's synced salary calculator state, preferences, and active comparison inputs.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "countryCode": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 12
+        },
+        "currencyCode": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 6
+        },
+        "currencySymbol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8
+        },
+        "inputMode": {
+          "type": "string",
+          "enum": ["annual", "monthly", "fortnightly", "weekly", "daily", "hourly"]
+        },
+        "inputAmount": {
+          "type": "number"
+        },
+        "employmentType": {
+          "type": "string",
+          "enum": ["full_time", "part_time", "casual"]
+        },
+        "hasCasualLoading": {
+          "type": "boolean"
+        },
+        "casualLoadingPct": {
+          "type": "number"
+        },
+        "agreedWeeklyHours": {
+          "type": "number"
+        },
+        "claimTaxFreeThreshold": {
+          "type": "boolean"
+        },
+        "overtimeHoursWeekly": {
+          "type": "number"
+        },
+        "overtimeMultiplier": {
+          "type": "number"
+        },
+        "saturdayHoursWeekly": {
+          "type": "number"
+        },
+        "saturdayMultiplier": {
+          "type": "number"
+        },
+        "sundayHoursWeekly": {
+          "type": "number"
+        },
+        "sundayMultiplier": {
+          "type": "number"
+        },
+        "publicHolidayHoursWeekly": {
+          "type": "number"
+        },
+        "publicHolidayMultiplier": {
+          "type": "number"
+        },
+        "casualPenaltyMethod": {
+          "type": "string",
+          "enum": ["compounding", "cumulative"]
+        },
+        "targetCurrency": {
+          "type": "string",
+          "maxLength": 6
+        },
+        "exchangeRate": {
+          "type": "number"
+        },
+        "favoriteCurrencies": {
+          "type": "array"
+        },
+        "standardHoursPerDay": {
+          "type": "number"
+        },
+        "standardDaysPerWeek": {
+          "type": "number"
+        },
+        "weeksPerYear": {
+          "type": "number"
+        },
+        "retirementLabel": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "superRate": {
+          "type": "number"
+        },
+        "superMode": {
+          "type": "string",
+          "enum": ["employer_paid", "included_in_package"]
+        },
+        "taxMode": {
+          "type": "string",
+          "enum": ["country_scale", "custom_flat", "custom_brackets"]
+        },
+        "compareCurrentMode": {
+          "type": "string",
+          "enum": ["annual", "monthly", "fortnightly", "weekly", "daily", "hourly"]
+        },
+        "compareCurrentAmount": {
+          "type": "number"
+        },
+        "compareTargetMode": {
+          "type": "string",
+          "enum": ["annual", "monthly", "fortnightly", "weekly", "daily", "hourly"]
+        },
+        "compareTargetAmount": {
+          "type": "number"
+        },
+        "compareTargetDriver": {
+          "type": "string",
+          "enum": ["amount", "percent"]
+        },
+        "compareTargetRaisePct": {
+          "type": "number"
+        },
+        "retirementStartingSavings": {
+          "type": "number"
+        },
+        "retirementSavingsRatePct": {
+          "type": "number"
+        },
+        "retirementIncludeEmployer": {
+          "type": "boolean"
+        },
+        "retirementAnnualReturnPct": {
+          "type": "number"
+        },
+        "retirementAnnualInflationPct": {
+          "type": "number"
+        },
+        "retirementYears": {
+          "type": "number"
+        },
+        "retirementValueMode": {
+          "type": "string",
+          "enum": ["nominal", "real"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "countryCode",
+        "currencyCode",
+        "currencySymbol",
+        "inputMode",
+        "inputAmount",
+        "employmentType",
+        "hasCasualLoading",
+        "casualLoadingPct",
+        "agreedWeeklyHours",
+        "claimTaxFreeThreshold",
+        "overtimeHoursWeekly",
+        "overtimeMultiplier",
+        "saturdayHoursWeekly",
+        "saturdayMultiplier",
+        "sundayHoursWeekly",
+        "sundayMultiplier",
+        "publicHolidayHoursWeekly",
+        "publicHolidayMultiplier",
+        "casualPenaltyMethod",
+        "targetCurrency",
+        "exchangeRate",
+        "favoriteCurrencies",
+        "standardHoursPerDay",
+        "standardDaysPerWeek",
+        "weeksPerYear",
+        "retirementLabel",
+        "superRate",
+        "superMode",
+        "taxMode",
+        "compareCurrentMode",
+        "compareCurrentAmount",
+        "compareTargetMode",
+        "compareTargetAmount",
+        "compareTargetDriver",
+        "compareTargetRaisePct",
+        "retirementStartingSavings",
+        "retirementSavingsRatePct",
+        "retirementIncludeEmployer",
+        "retirementAnnualReturnPct",
+        "retirementAnnualInflationPct",
+        "retirementYears",
+        "retirementValueMode",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SavedComparison": {
+      "title": "SavedComparison",
+      "description": "A saved job-offer or payrise comparison owned by an authenticated user.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "savedAt": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "countryCode": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 12
+        },
+        "currencyCode": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 6
+        },
+        "currencySymbol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8
+        },
+        "currentMode": {
+          "type": "string",
+          "enum": ["annual", "monthly", "fortnightly", "weekly", "daily", "hourly"]
+        },
+        "currentAmount": {
+          "type": "number"
+        },
+        "targetMode": {
+          "type": "string",
+          "enum": ["annual", "monthly", "fortnightly", "weekly", "daily", "hourly"]
+        },
+        "targetAmount": {
+          "type": "number"
+        },
+        "targetDriver": {
+          "type": "string",
+          "enum": ["amount", "percent"]
+        },
+        "targetRaisePct": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ownerId",
+        "name",
+        "savedAt",
+        "countryCode",
+        "currencyCode",
+        "currencySymbol",
+        "currentMode",
+        "currentAmount",
+        "targetMode",
+        "targetAmount",
+        "targetDriver",
+        "targetRaisePct",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/workspace/{docId}": {
+      "schema": { "$ref": "#/entities/WorkspaceState" },
+      "description": "Private synced calculator workspace and last entered salary for an authenticated user."
+    },
+    "/users/{userId}/comparisons/{comparisonId}": {
+      "schema": { "$ref": "#/entities/SavedComparison" },
+      "description": "Private saved job-offer comparisons synced across devices for an authenticated user."
+    }
+  }
+}

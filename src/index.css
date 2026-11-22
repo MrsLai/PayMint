@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html[data-theme="midnight"] {
+    --color-slate-950: #000000;
+    --color-slate-900: #090a0f;
+    --color-slate-800: #151821;
+    --color-slate-700: #3d4457;
+    --color-slate-600: #94a3b8;
+    --color-slate-500: #cbd5e1;
+    --color-slate-400: #e2e8f0;
+    --color-slate-300: #f1f5f9;
+    --color-slate-200: #f8fafc;
+    --color-slate-100: #ffffff;
+    --color-emerald-400: #34d399;
+    --color-sky-400: #38bdf8;
+    --color-amber-300: #fde047;
+  }
+
+  html[data-accent="emerald"] {
+    --color-teal-50: #ecfdf5;
+    --color-teal-100: #d1fae5;
+    --color-teal-200: #a7f3d0;
+    --color-teal-300: #6ee7b7;
+    --color-teal-400: #34d399;
+    --color-teal-500: #10b981;
+    --color-teal-600: #047857;
+    --color-teal-700: #065f46;
+    --color-teal-800: #064e3b;
+    --color-teal-900: #022c22;
+    --color-teal-950: #022c22;
+  }
+
+  html[data-accent="blue"] {
+    --color-teal-50: #eff6ff;
+    --color-teal-100: #dbeafe;
+    --color-teal-200: #bfdbfe;
+    --color-teal-300: #93c5fd;
+    --color-teal-400: #60a5fa;
+    --color-teal-500: #3b82f6;
+    --color-teal-600: #2563eb;
+    --color-teal-700: #1d4ed8;
+    --color-teal-800: #1e40af;
+    --color-teal-900: #1e3a8a;
+    --color-teal-950: #172554;
+  }
+
+  html[data-accent="indigo"] {
+    --color-teal-50: #eef2ff;
+    --color-teal-100: #e0e7ff;
+    --color-teal-200: #c7d2fe;
+    --color-teal-300: #a5b4fc;
+    --color-teal-400: #818cf8;
+    --color-teal-500: #6366f1;
+    --color-teal-600: #4f46e5;
+    --color-teal-700: #4338ca;
+    --color-teal-800: #3730a3;
+    --color-teal-900: #312e81;
+    --color-teal-950: #1e1b4b;
+  }
+
+  html[data-accent="violet"] {
+    --color-teal-50: #f5f3ff;
+    --color-teal-100: #ede9fe;
+    --color-teal-200: #ddd6fe;
+    --color-teal-300: #c4b5fd;
+    --color-teal-400: #a78bfa;
+    --color-teal-500: #8b5cf6;
+    --color-teal-600: #7c3aed;
+    --color-teal-700: #6d28d9;
+    --color-teal-800: #5b21b6;
+    --color-teal-900: #4c1d95;
+    --color-teal-950: #2e1065;
+  }
+
+  html[data-accent="amber"] {
+    --color-teal-50: #fffbeb;
+    --color-teal-100: #fef3c7;
+    --color-teal-200: #fde68a;
+    --color-teal-300: #fcd34d;
+    --color-teal-400: #fbbf24;
+    --color-teal-500: #d97706;
+    --color-teal-600: #b45309;
+    --color-teal-700: #92400e;
+    --color-teal-800: #78350f;
+    --color-teal-900: #451a03;
+    --color-teal-950: #451a03;
+  }
+
+  html[data-accent="rose"] {
+    --color-teal-50: #fff1f2;
+    --color-teal-100: #ffe4e6;
+    --color-teal-200: #fecdd3;
+    --color-teal-300: #fda4af;
+    --color-teal-400: #fb7185;
+    --color-teal-500: #f43f5e;
+    --color-teal-600: #e11d48;
+    --color-teal-700: #be123c;
+    --color-teal-800: #9f1239;
+    --color-teal-900: #881337;
+    --color-teal-950: #4c0519;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #f2f6fa;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html.dark body {
+    background-color: #020617;
+    color: #f1f5f9;
+  }
+
+  html[data-theme="midnight"] body {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  ::selection {
+    background-color: var(--color-teal-100, #ccfbf1);
+    color: var(--color-teal-700, #0f766e);
+  }
+
+  html.dark ::selection {
+    background-color: var(--color-teal-900, #134e4a);
+    color: var(--color-teal-100, #ccfbf1);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes paymintResultFadeIn {
+  from {
+    opacity: 0.45;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-result-fade {
+  animation: paymintResultFadeIn 210ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-result-fade {
+    animation: none;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "PayMint",
+  "description": "Global salary, net take-home pay calculator, payrise comparison, and live currency converter with 2026–2027 country tax & superannuation rules.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

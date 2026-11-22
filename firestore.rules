@@ -1,0 +1,447 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    function isValidFrequency(val) {
+      return val is string && val in ['annual', 'monthly', 'fortnightly', 'weekly', 'daily', 'hourly'];
+    }
+
+    function isValidEmploymentType(val) {
+      return val is string && val in ['full_time', 'part_time', 'casual'];
+    }
+
+    function isValidCasualPenaltyMethod(val) {
+      return val is string && val in ['compounding', 'cumulative'];
+    }
+
+    function isValidSuperMode(val) {
+      return val is string && val in ['employer_paid', 'included_in_package'];
+    }
+
+    function isValidTaxMode(val) {
+      return val is string && val in ['country_scale', 'custom_flat', 'custom_brackets'];
+    }
+
+    function isValidTargetDriver(val) {
+      return val is string && val in ['amount', 'percent'];
+    }
+
+    function isValidValueMode(val) {
+      return val is string && val in ['nominal', 'real'];
+    }
+
+    function isValidWorkspacePayrollFields(data) {
+      return isValidFrequency(data.inputMode) &&
+        data.inputAmount is number &&
+        data.inputAmount >= 0 &&
+        data.inputAmount <= 1000000000000 &&
+        isValidEmploymentType(data.employmentType) &&
+        data.hasCasualLoading is bool &&
+        data.casualLoadingPct is number &&
+        data.casualLoadingPct >= 0 &&
+        data.casualLoadingPct <= 100 &&
+        data.agreedWeeklyHours is number &&
+        data.agreedWeeklyHours >= 1 &&
+        data.agreedWeeklyHours <= 80 &&
+        data.claimTaxFreeThreshold is bool &&
+        data.overtimeHoursWeekly is number &&
+        data.overtimeHoursWeekly >= 0 &&
+        data.overtimeHoursWeekly <= 100 &&
+        data.overtimeMultiplier is number &&
+        data.overtimeMultiplier >= 1 &&
+        data.overtimeMultiplier <= 10;
+    }
+
+    function isValidWorkspaceShiftFields(data) {
+      return data.saturdayHoursWeekly is number &&
+        data.saturdayHoursWeekly >= 0 &&
+        data.saturdayHoursWeekly <= 100 &&
+        data.saturdayMultiplier is number &&
+        data.saturdayMultiplier >= 1 &&
+        data.saturdayMultiplier <= 10 &&
+        data.sundayHoursWeekly is number &&
+        data.sundayHoursWeekly >= 0 &&
+        data.sundayHoursWeekly <= 100 &&
+        data.sundayMultiplier is number &&
+        data.sundayMultiplier >= 1 &&
+        data.sundayMultiplier <= 10 &&
+        data.publicHolidayHoursWeekly is number &&
+        data.publicHolidayHoursWeekly >= 0 &&
+        data.publicHolidayHoursWeekly <= 100 &&
+        data.publicHolidayMultiplier is number &&
+        data.publicHolidayMultiplier >= 1 &&
+        data.publicHolidayMultiplier <= 10 &&
+        isValidCasualPenaltyMethod(data.casualPenaltyMethod);
+    }
+
+    function isValidWorkspaceScheduleAndCompare(data) {
+      return data.targetCurrency is string &&
+        data.targetCurrency.size() <= 6 &&
+        data.exchangeRate is number &&
+        data.exchangeRate > 0 &&
+        data.exchangeRate <= 10000000 &&
+        data.favoriteCurrencies is list &&
+        data.favoriteCurrencies.size() <= 5 &&
+        (
+          data.favoriteCurrencies.size() == 0 ||
+          (data.favoriteCurrencies[0] is string && data.favoriteCurrencies[0].size() <= 6)
+        ) &&
+        data.standardHoursPerDay is number &&
+        data.standardHoursPerDay >= 1 &&
+        data.standardHoursPerDay <= 24 &&
+        data.standardDaysPerWeek is number &&
+        data.standardDaysPerWeek >= 1 &&
+        data.standardDaysPerWeek <= 7 &&
+        data.weeksPerYear is number &&
+        data.weeksPerYear >= 1 &&
+        data.weeksPerYear <= 53 &&
+        data.retirementLabel is string &&
+        data.retirementLabel.size() <= 64 &&
+        data.superRate is number &&
+        data.superRate >= 0 &&
+        data.superRate <= 100 &&
+        isValidSuperMode(data.superMode) &&
+        isValidTaxMode(data.taxMode);
+    }
+
+    function isValidWorkspaceRetirementAndMeta(data) {
+      return isValidFrequency(data.compareCurrentMode) &&
+        data.compareCurrentAmount is number &&
+        data.compareCurrentAmount >= 0 &&
+        data.compareCurrentAmount <= 1000000000000 &&
+        isValidFrequency(data.compareTargetMode) &&
+        data.compareTargetAmount is number &&
+        data.compareTargetAmount >= 0 &&
+        data.compareTargetAmount <= 1000000000000 &&
+        isValidTargetDriver(data.compareTargetDriver) &&
+        data.compareTargetRaisePct is number &&
+        data.compareTargetRaisePct >= -99 &&
+        data.compareTargetRaisePct <= 500 &&
+        data.retirementStartingSavings is number &&
+        data.retirementStartingSavings >= 0 &&
+        data.retirementStartingSavings <= 1000000000000 &&
+        data.retirementSavingsRatePct is number &&
+        data.retirementSavingsRatePct >= 0 &&
+        data.retirementSavingsRatePct <= 100 &&
+        data.retirementIncludeEmployer is bool &&
+        data.retirementAnnualReturnPct is number &&
+        data.retirementAnnualReturnPct >= 0 &&
+        data.retirementAnnualReturnPct <= 30 &&
+        data.retirementAnnualInflationPct is number &&
+        data.retirementAnnualInflationPct >= 0 &&
+        data.retirementAnnualInflationPct <= 25 &&
+        data.retirementYears is number &&
+        data.retirementYears >= 1 &&
+        data.retirementYears <= 50 &&
+        isValidValueMode(data.retirementValueMode) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidWorkspaceState(data, userId) {
+      return data.keys().hasAll([
+        'ownerId',
+        'countryCode',
+        'currencyCode',
+        'currencySymbol',
+        'inputMode',
+        'inputAmount',
+        'employmentType',
+        'hasCasualLoading',
+        'casualLoadingPct',
+        'agreedWeeklyHours',
+        'claimTaxFreeThreshold',
+        'overtimeHoursWeekly',
+        'overtimeMultiplier',
+        'saturdayHoursWeekly',
+        'saturdayMultiplier',
+        'sundayHoursWeekly',
+        'sundayMultiplier',
+        'publicHolidayHoursWeekly',
+        'publicHolidayMultiplier',
+        'casualPenaltyMethod',
+        'targetCurrency',
+        'exchangeRate',
+        'favoriteCurrencies',
+        'standardHoursPerDay',
+        'standardDaysPerWeek',
+        'weeksPerYear',
+        'retirementLabel',
+        'superRate',
+        'superMode',
+        'taxMode',
+        'compareCurrentMode',
+        'compareCurrentAmount',
+        'compareTargetMode',
+        'compareTargetAmount',
+        'compareTargetDriver',
+        'compareTargetRaisePct',
+        'retirementStartingSavings',
+        'retirementSavingsRatePct',
+        'retirementIncludeEmployer',
+        'retirementAnnualReturnPct',
+        'retirementAnnualInflationPct',
+        'retirementYears',
+        'retirementValueMode',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'ownerId',
+        'countryCode',
+        'currencyCode',
+        'currencySymbol',
+        'inputMode',
+        'inputAmount',
+        'employmentType',
+        'hasCasualLoading',
+        'casualLoadingPct',
+        'agreedWeeklyHours',
+        'claimTaxFreeThreshold',
+        'overtimeHoursWeekly',
+        'overtimeMultiplier',
+        'saturdayHoursWeekly',
+        'saturdayMultiplier',
+        'sundayHoursWeekly',
+        'sundayMultiplier',
+        'publicHolidayHoursWeekly',
+        'publicHolidayMultiplier',
+        'casualPenaltyMethod',
+        'targetCurrency',
+        'exchangeRate',
+        'favoriteCurrencies',
+        'standardHoursPerDay',
+        'standardDaysPerWeek',
+        'weeksPerYear',
+        'retirementLabel',
+        'superRate',
+        'superMode',
+        'taxMode',
+        'compareCurrentMode',
+        'compareCurrentAmount',
+        'compareTargetMode',
+        'compareTargetAmount',
+        'compareTargetDriver',
+        'compareTargetRaisePct',
+        'retirementStartingSavings',
+        'retirementSavingsRatePct',
+        'retirementIncludeEmployer',
+        'retirementAnnualReturnPct',
+        'retirementAnnualInflationPct',
+        'retirementYears',
+        'retirementValueMode',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.ownerId is string &&
+      data.ownerId == userId &&
+      data.ownerId.size() >= 1 &&
+      data.ownerId.size() <= 128 &&
+      data.countryCode is string &&
+      data.countryCode.size() >= 2 &&
+      data.countryCode.size() <= 12 &&
+      data.currencyCode is string &&
+      data.currencyCode.size() >= 3 &&
+      data.currencyCode.size() <= 6 &&
+      data.currencySymbol is string &&
+      data.currencySymbol.size() >= 1 &&
+      data.currencySymbol.size() <= 8 &&
+      isValidWorkspacePayrollFields(data) &&
+      isValidWorkspaceShiftFields(data) &&
+      isValidWorkspaceScheduleAndCompare(data) &&
+      isValidWorkspaceRetirementAndMeta(data);
+    }
+
+    function isValidSavedComparison(data, userId) {
+      return data.keys().hasAll([
+        'ownerId',
+        'name',
+        'savedAt',
+        'countryCode',
+        'currencyCode',
+        'currencySymbol',
+        'currentMode',
+        'currentAmount',
+        'targetMode',
+        'targetAmount',
+        'targetDriver',
+        'targetRaisePct',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'ownerId',
+        'name',
+        'savedAt',
+        'countryCode',
+        'currencyCode',
+        'currencySymbol',
+        'currentMode',
+        'currentAmount',
+        'targetMode',
+        'targetAmount',
+        'targetDriver',
+        'targetRaisePct',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.ownerId is string &&
+      data.ownerId == userId &&
+      data.ownerId.size() >= 1 &&
+      data.ownerId.size() <= 128 &&
+      data.name is string &&
+      data.name.size() >= 1 &&
+      data.name.size() <= 80 &&
+      data.savedAt is string &&
+      data.savedAt.size() >= 4 &&
+      data.savedAt.size() <= 40 &&
+      data.countryCode is string &&
+      data.countryCode.size() >= 2 &&
+      data.countryCode.size() <= 12 &&
+      data.currencyCode is string &&
+      data.currencyCode.size() >= 3 &&
+      data.currencyCode.size() <= 6 &&
+      data.currencySymbol is string &&
+      data.currencySymbol.size() >= 1 &&
+      data.currencySymbol.size() <= 8 &&
+      isValidFrequency(data.currentMode) &&
+      data.currentAmount is number &&
+      data.currentAmount >= 0 &&
+      data.currentAmount <= 1000000000000 &&
+      isValidFrequency(data.targetMode) &&
+      data.targetAmount is number &&
+      data.targetAmount >= 0 &&
+      data.targetAmount <= 1000000000000 &&
+      isValidTargetDriver(data.targetDriver) &&
+      data.targetRaisePct is number &&
+      data.targetRaisePct >= -99 &&
+      data.targetRaisePct <= 500 &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    match /users/{userId}/workspace/{docId} {
+      allow get: if isOwner(userId) && isValidId(docId) && docId == 'state' && (resource == null || resource.data.ownerId == request.auth.uid);
+      allow list: if false;
+      allow create: if isOwner(userId) &&
+        isValidId(docId) &&
+        docId == 'state' &&
+        isValidWorkspaceState(incoming(), userId) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isOwner(userId) &&
+        isValidId(docId) &&
+        docId == 'state' &&
+        isValidWorkspaceState(incoming(), userId) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'countryCode',
+          'currencyCode',
+          'currencySymbol',
+          'inputMode',
+          'inputAmount',
+          'employmentType',
+          'hasCasualLoading',
+          'casualLoadingPct',
+          'agreedWeeklyHours',
+          'claimTaxFreeThreshold',
+          'overtimeHoursWeekly',
+          'overtimeMultiplier',
+          'saturdayHoursWeekly',
+          'saturdayMultiplier',
+          'sundayHoursWeekly',
+          'sundayMultiplier',
+          'publicHolidayHoursWeekly',
+          'publicHolidayMultiplier',
+          'casualPenaltyMethod',
+          'targetCurrency',
+          'exchangeRate',
+          'favoriteCurrencies',
+          'standardHoursPerDay',
+          'standardDaysPerWeek',
+          'weeksPerYear',
+          'retirementLabel',
+          'superRate',
+          'superMode',
+          'taxMode',
+          'compareCurrentMode',
+          'compareCurrentAmount',
+          'compareTargetMode',
+          'compareTargetAmount',
+          'compareTargetDriver',
+          'compareTargetRaisePct',
+          'retirementStartingSavings',
+          'retirementSavingsRatePct',
+          'retirementIncludeEmployer',
+          'retirementAnnualReturnPct',
+          'retirementAnnualInflationPct',
+          'retirementYears',
+          'retirementValueMode',
+          'updatedAt'
+        ]);
+      allow delete: if isOwner(userId) && isValidId(docId) && docId == 'state';
+    }
+
+    match /users/{userId}/comparisons/{comparisonId} {
+      allow get: if isOwner(userId) && isValidId(comparisonId) && (resource == null || resource.data.ownerId == request.auth.uid);
+      allow list: if isOwner(userId) && resource.data.ownerId == request.auth.uid;
+      allow create: if isOwner(userId) &&
+        isValidId(comparisonId) &&
+        isValidSavedComparison(incoming(), userId) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isOwner(userId) &&
+        isValidId(comparisonId) &&
+        isValidSavedComparison(incoming(), userId) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'name',
+          'savedAt',
+          'countryCode',
+          'currencyCode',
+          'currencySymbol',
+          'currentMode',
+          'currentAmount',
+          'targetMode',
+          'targetAmount',
+          'targetDriver',
+          'targetRaisePct',
+          'updatedAt'
+        ]);
+      allow delete: if isOwner(userId) && isValidId(comparisonId);
+    }
+  }
+}
